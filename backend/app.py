@@ -1,8 +1,5 @@
 from flask import Flask, request, jsonify
 from flask_cors import CORS
-from Crypto.PublicKey import RSA
-from Crypto.Cipher import PKCS1_OAEP
-import base64
 import paramiko
 import pandas as pd
 from io import StringIO
@@ -16,23 +13,6 @@ import os
 
 app = Flask(__name__)
 CORS(app)
-
-def gen_keys():
-    '''
-    Generate private and public rsa keys if they do not exist already
-    '''
-    if not os.path.isfile("private.pem"):
-        key = RSA.generate(2048)
-        private_key = key.export_key()
-        with open("private.pem", "wb") as f:
-            f.write(private_key)
-        
-        public_key = key.publickey().export_key()
-        with open("public.pem", "wb") as f:
-            f.write(public_key)
-    else:
-        pass
-
 
 def ssh_login(username, password, ip):
     '''
@@ -100,41 +80,30 @@ def processing_data(data):
     fig_table.sort_values(by='Usage(%)', ascending=False, inplace=True)
     return fig_pie, fig_table
 
-# gen_keys()
+@app.route("/health", methods=["GET"])
+def health():
+    return jsonify({"ok": True})
 
-# @app.route('/public-key', methods=['GET'])
-# def get_public_key():
-#     with open("public.pem", "rb") as f:
-#         public_key = f.read()
-#     return public_key, 200, {"content-Type": "text/plain"}
-
-# @app.route('/', methods=['POST'])
-# def get_login():
-#     '''
-#     Gets all login data from user input, collects data from etx instance, and sends figures to frontend
-#     '''
-#     data = request.get_json(silent=True) or {}
-#     encrypted_b64 = data.get("payload")
-#     if not encrypted_b64:
-#         return jsonify({"ok" : False, "message" : "Missing encrypted payload"}), 400
-    
-#     encrypted_bytes = base64.b64decode(encrypted_b64)
-
-#     with open("private.pem", "rb") as f:
-#         private_key = RSA.import_key(f.read())
-
-    
+@app.route('/', methods=['POST'])
+def get_login():
+    '''
+    Gets all login data from user input, collects data from etx instance, and sends figures to frontend
+    '''
+    data = request.get_json(silent=True) or {}
     username = data.get('username')
     password = data.get('password')
     ip = data.get('ip')
+
     if not username or not password or not ip:
         return jsonify({"ok": False, "message": "Username, password and ip required"}), 400
+    
     ok, message = ssh_login(username, password, ip)
+    if not ok:
+        return jsonify({"ok" : False, "message" : message}), 401
     print(f"Login attempt for {username} at {ip}: {'Success' if ok else 'Failure'}")
     fig_pie, fig_table = processing_data(message)
     safe_fig_pie = json.loads(json.dumps(fig_pie, cls=PlotlyJSONEncoder))
     return jsonify({"ok": ok, "message": message, "figure_pie": safe_fig_pie, "figure_table": fig_table.to_dict(orient='records')})
 
 if __name__ == '__main__':
-    app.run(host='127.0.0.1', port = 5000, debug=True)
-
+    app.run(ssl_context='adhoc', host='127.0.0.1', port = 5000, debug=True)
