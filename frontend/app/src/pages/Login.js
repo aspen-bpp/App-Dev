@@ -3,6 +3,8 @@ import { useNavigate } from 'react-router-dom';
 
 function Login() {
 
+
+
   console.log("✅ Running src/pages/Login.js", new Date().toISOString());
 
   const [username, setUsername] = useState('' );
@@ -48,53 +50,82 @@ function Login() {
   };
 
   return (
-    <div style= {{ padding: '2rem', fontFamily: 'sans-serif'}}>
-      <h2> Login with username, password and ip address of ETX instance</h2>
-      <form onSubmit={handleSubmit}>
-        <div>
-          <label>
-            Username:
+  <div className="min-h-screen bg-slate-100 flex items-center justify-center px-4">
+    <div className="w-full max-w-md">
+      <div className="bg-white rounded-2xl shadow-lg border border-slate-200 p-8">
+        <h1 className="text-2xl font-semibold text-slate-900 text-center">
+          ETX Login
+        </h1>
+        <p className="mt-2 text-sm text-slate-600 text-center">
+          Enter your username, password and ETX instance IP.
+        </p>
+
+        <form onSubmit={handleSubmit} className="mt-6 space-y-4">
+          <div>
+            <label className="block text-sm font-medium text-slate-700">
+              Username
+            </label>
             <input
               type="text"
               value={username}
               onChange={handleUsernameChange}
               placeholder="Username"
               required
+              className="mt-1 w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-slate-900
+                         focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
             />
-          </label>
-        </div>
-        <div>
-          <label>
-            Password:
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-slate-700">
+              Password
+            </label>
             <input
               type="password"
               value={password}
               onChange={handlePasswordChange}
               placeholder="Password"
               required
+              className="mt-1 w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-slate-900
+                         focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
             />
-          </label>
-        </div>
-        <div>
-          <label>
-            IP Adress:
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-slate-700">
+              IP Address
+            </label>
             <input
               type="text"
               value={ip}
               onChange={handleIpChange}
-              placeholder="IP Address"
+              placeholder="IP address"
               required
+              className="mt-1 w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-slate-900
+                         focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
             />
-          </label>
-        </div>
-        <div>
-          <label>
-            <button type="submit" style={{ marginTop: '1rem' }}>Login</button>
-          </label>
-        </div>
-      </form>
+            <p className="mt-2 text-xs text-slate-500">
+              Tip: use the private IP that your SSH client connects to.
+            </p>
+          </div>
+
+          <button
+            type="submit"
+            className="w-full rounded-lg bg-blue-600 py-2.5 text-white font-medium
+                       hover:bg-blue-700 active:bg-blue-800 transition
+                       focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+          >
+            Login
+          </button>
+        </form>
+      </div>
+
+      <p className="mt-4 text-center text-xs text-slate-500">
+        If login fails, check the IP/credentials and that the backend is running.
+      </p>
     </div>
-  );
+  </div>
+);
 }
 
 export default Login;
