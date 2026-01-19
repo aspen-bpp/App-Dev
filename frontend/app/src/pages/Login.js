@@ -29,7 +29,7 @@ function Login() {
       return;
     }
 
-    navigate("/Data", { state: { figure: json.figure_pie, figure_table: json.figure_table } });
+    navigate("/Data", { state: { figure: json.figure_pie, figure_table: json.figure_table, png_path: json.png_path, table_path: json.table_path } });
   } catch (err) {
     console.error(err);
     alert("Request failed. If using Flask HTTPS adhoc, open https://127.0.0.1:5000/health in the browser and click Proceed once.");

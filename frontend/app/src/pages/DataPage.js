@@ -7,6 +7,8 @@ export default function DataPage() {
     const location = useLocation();
     const fig = location.state?.figure;
     const fig_table = location.state?.figure_table;
+    const png_path = location.state?.png_path;
+    const table_path = location.state?.table_path;
 
     if (!fig && !fig_table) {
         return (
@@ -19,7 +21,41 @@ export default function DataPage() {
 
     const columns = fig_table && fig_table.length > 0 ? Object.keys(fig_table[0]): [];
 
+    console.log("Reminder payload preview:", {
+      fig,
+      fig_table_len: fig_table?.length,
+      first_row: fig_table?.[0],
+    });
+
+    const handleSendReminder = async () => {
+      try {
+        const res = await fetch("https://127.0.0.1:5000/command", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            command: "send_reminder",
+            payload: {
+              png_path,
+              table_path,
+            },
+          }),
+        });
+
+        const json = await res.json();
+        if (!json.ok) {
+          alert(json.message);
+          return;
+        }
+
+        alert("Slack reminder sent!");
+      } catch (err) {
+        console.error(err);
+        alert("Failed to send reminder: ", err);
+      }
+    };
+
     return (
+
   <div className="min-h-screen bg-slate-100">
     <div className="mx-auto max-w-6xl px-4 py-8">
       {/* Header */}
@@ -39,7 +75,7 @@ export default function DataPage() {
             ← Back
           </Link>
 
-          <button
+          <button onClick={handleSendReminder}
             className="inline-flex items-center justify-center rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-blue-700 active:bg-blue-800 transition focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
           >
             Send Reminder
