@@ -50,7 +50,7 @@ export default function DataPage() {
         alert("Slack reminder sent!");
       } catch (err) {
         console.error(err);
-        alert("Failed to send reminder: ", err);
+        alert(`Failed to send reminder: ${err?.mesage ?? err}`);
       }
     };
 

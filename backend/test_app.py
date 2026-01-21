@@ -2,6 +2,8 @@ from app import ssh_login, convert_to_mb, processing_data
 from unittest.mock import MagicMock, patch
 import pandas as pd
 
+#SSH LOGIN
+
 def test_ssh_login():
     fake_stdout = MagicMock()
     fake_stdout.read.return_value = b"Filesystem Size Used Avail Use% Mounted on\n/dev/xvda1 20G 10G 10G 50% /\n"
@@ -19,6 +21,8 @@ def test_ssh_login():
     fake_client.connect.assert_called_once_with("1.2.3.4", username="user", password="pass")
     fake_client.close.assert_called_once()
 
+#CONVERSION FUNCTION
+
 def test_convert_to_mb_G():
     val = convert_to_mb("10G")
     assert val == 10000
@@ -34,6 +38,12 @@ def test_convert_to_mb_K():
 def test_convert_to_mb_T():
     val = convert_to_mb("10T")
     assert val == 10000000
+
+def test_unexpected_suffix():
+    val = convert_to_mb("10L")
+    assert val == 0.0
+
+# DATA PROCESSING
 
 def test_processing_data():
     test_data = """Filesystem                                                                                                                         Size  Used Avail Use% Mounted on
